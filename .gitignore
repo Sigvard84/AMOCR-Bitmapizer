@@ -31,5 +31,6 @@
 *.out
 *.app
 
-# Mac Finder files
+# Mac files
 *.DS_STORE
+*.xcodeproj

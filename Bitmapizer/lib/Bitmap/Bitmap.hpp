@@ -4,7 +4,10 @@
 #include <stdio.h>
 #include <cstdint>
 #include <cstddef>
+#include <filesystem>
+#include "FileManager.hpp"
 
+namespace fs = std::filesystem;
 using namespace std;
 
 class Bitmap {
@@ -19,6 +22,9 @@ private:
     
     void createHeader();
     void getPixels(const uint8_t* pxData);
+    void getPixelsFromBmp(const uint8_t* pxData);
+    void setNumberOfColours();
+    void setHeaderData();
     
     
 public:
@@ -28,6 +34,7 @@ public:
     size_t m_byteLength;
     size_t m_headerSize;
     
+    Bitmap(fs::path srcFile);
     Bitmap(size_t width, size_t height, size_t byteLength, uint8_t bitsPerPx, const uint8_t* pxData);
     ~Bitmap();
     

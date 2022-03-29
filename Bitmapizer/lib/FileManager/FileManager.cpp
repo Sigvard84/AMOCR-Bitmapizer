@@ -7,10 +7,15 @@
 
 #include "FileManager.hpp"
 
-FileManager::FileManager(fs::path readFile, fs::path writePath) {
+FileManager::FileManager(fs::path srcPath) {
     
-    m_readFile = readFile;
-    m_writePath = writePath;
+    m_srcPath = srcPath;
+}
+
+FileManager::FileManager(fs::path srcPath, fs::path destinationPath) {
+    
+    m_srcPath = srcPath;
+    m_destinationPath = destinationPath;
 }
 
 
@@ -24,45 +29,45 @@ FileManager::~FileManager() {
 
 void FileManager::setFilenameAppendix(string appendix) {
     
-    string binPath = m_readFile;
+    string srcPath = m_srcPath;
     
     // Get the name of the binary file:
-    string binFilename = binPath.substr(binPath.find_last_of("/\\") + 1);
-    string::size_type const p(binFilename.find_last_of('.'));
+    string srcFileName = srcPath.substr(srcPath.find_last_of("/\\") + 1);
+    string::size_type const p(srcFileName.find_last_of('.'));
     
     // Set the name of the bmp file to save:
-    string bmpFileName = binFilename.substr(0, p) + appendix + ".bmp";
+    string bmpFileName = srcFileName.substr(0, p) + appendix + ".bmp";
     
     // Update m_writePath:
-    m_writePath += "/" + bmpFileName;
+    m_destinationPath += "/" + bmpFileName;
 }
 
 
 void FileManager::readBinaryData() {
     
-    ifstream file(m_readFile, ios::binary);
+    ifstream srcFile(m_srcPath, ios::binary);
     
     // Get file size:
-    file.seekg(0, ios::end);
-    m_fileSize = file.tellg();
-    file.seekg(0, ios::beg);
+    srcFile.seekg(0, ios::end);
+    m_fileSize = srcFile.tellg();
+    srcFile.seekg(0, ios::beg);
     
     m_bytes = new uint8_t[(int)m_fileSize];
     
     // Store file contents in m_bytes:
-    file.read((char*)m_bytes, m_fileSize);
+    srcFile.read((char*)m_bytes, m_fileSize);
     
-    file.close();
+    srcFile.close();
 }
 
 
-void FileManager::writeBitmap(Bitmap* bmp) {
+void FileManager::writeBitmap(uint8_t* header, size_t headerSize, uint8_t* pxData, size_t byteLength) {
     
     fstream bmpFile;
-    bmpFile.open(m_writePath, ios::app | ios::binary);
+    bmpFile.open(m_destinationPath, ios::app | ios::binary);
     
-    bmpFile.write(reinterpret_cast<char*>(bmp->m_header), bmp->m_headerSize);
-    bmpFile.write(reinterpret_cast<char*>(bmp->m_pxData), bmp->m_byteLength);
+    bmpFile.write(reinterpret_cast<char*>(header), headerSize);
+    bmpFile.write(reinterpret_cast<char*>(pxData), byteLength);
     
     bmpFile.close();
     

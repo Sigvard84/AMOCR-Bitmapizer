@@ -1,5 +1,32 @@
 #include "Bitmap.hpp"
 
+Bitmap::Bitmap(fs::path srcFile) {
+    
+    FileManager fm(srcFile);
+    
+    fm.readBinaryData();
+    uint8_t* fileBytes = fm.getBytes();
+    
+    m_width = fileBytes[18] + (fileBytes[19] << 8) + (fileBytes[20] << 16) + (fileBytes[21] << 24);
+    m_height = fileBytes[22] + (fileBytes[23] << 8) + (fileBytes[24] << 16) + (fileBytes[25] << 24);
+    m_bitsPerPx = fileBytes[28];
+    
+    m_paddingAmount = ((4 - (int(m_width) * (m_bitsPerPx/8)) % 4) % 4);
+    
+    setNumberOfColours();
+    setHeaderData();
+    
+    m_fileSize = fileBytes[2] + (fileBytes[3] << 8) + (fileBytes[4] << 16) + (fileBytes[5] << 24);
+    m_byteLength = m_fileSize - m_headerSize;
+    m_fileSize = m_headerSize + m_byteLength;
+        
+    createHeader();
+    
+    uint8_t* pxDataStart = &fileBytes[m_headerSize];
+    getPixelsFromBmp(pxDataStart);
+}
+
+
 
 Bitmap::Bitmap(size_t width, size_t height, size_t byteLength, uint8_t bitsPerPx, const uint8_t* pxData) {
     
@@ -10,7 +37,29 @@ Bitmap::Bitmap(size_t width, size_t height, size_t byteLength, uint8_t bitsPerPx
     m_paddingAmount = ((4 - (int(width) * (m_bitsPerPx/8)) % 4) % 4);
     m_byteLength = byteLength + (m_paddingAmount * m_height);
     
-    // Determine number of colours used:
+    setNumberOfColours();
+    setHeaderData();
+    
+    m_fileSize = m_headerSize + m_byteLength;
+    
+    createHeader();
+    
+    getPixels(pxData);
+}
+
+
+Bitmap::~Bitmap() {
+    
+    if (m_pxData != nullptr)
+        delete [] m_pxData;
+    
+    if (m_header != nullptr)
+        delete [] m_header;
+}
+
+
+void Bitmap::setNumberOfColours() {
+    
     switch(m_bitsPerPx) {
         case 8:
             m_numberOfColours = 256;
@@ -28,20 +77,16 @@ Bitmap::Bitmap(size_t width, size_t height, size_t byteLength, uint8_t bitsPerPx
             m_numberOfColours = 0; // More than 256 colours
             break;
     }
-    
-    createHeader();
-    
-    getPixels(pxData);
 }
 
 
-Bitmap::~Bitmap() {
+void Bitmap::getPixelsFromBmp(const uint8_t* pxData) {
     
-    if (m_pxData != nullptr)
-        delete [] m_pxData;
+    m_pxData = new uint8_t[m_byteLength];
     
-    if (m_header != nullptr)
-        delete [] m_header;
+    for (int i = 0; i < m_byteLength; i++) {
+        m_pxData[i] = pxData[i];
+    }
 }
 
 
@@ -76,14 +121,16 @@ void Bitmap::getPixels(const uint8_t* pxData) {
 }
 
 
-void Bitmap::createHeader() {
+void Bitmap::setHeaderData() {
     
     const int colourTableSize = m_numberOfColours * 4;
+    
     m_headerSize = 54 + colourTableSize; // 54 = fileHeader(14) + infoHeader(40)
-    
-    m_fileSize = m_headerSize + m_byteLength;
-    
     m_header = new uint8_t[m_headerSize];
+}
+
+
+void Bitmap::createHeader() {
     
     // FILE HEADER //
     
@@ -102,10 +149,10 @@ void Bitmap::createHeader() {
     m_header[8] = 0;
     m_header[9] = 0;
     // Pixel data offset
-    m_header[10] = m_headerSize;
-    m_header[11] = 0;
-    m_header[12] = 0;
-    m_header[13] = 0;
+    m_header[10] = m_headerSize; //m_headerSize;
+    m_header[11] = m_headerSize >> 8;
+    m_header[12] = m_headerSize >> 16;
+    m_header[13] = m_headerSize >> 24;
     
     // INFORMATION HEADER //
     
@@ -162,7 +209,7 @@ void Bitmap::createHeader() {
     m_header[53] = 0;
     
     
-    //Todo: colour table(s)
+    //TODO: colour table(s)
     
 }
 

@@ -6,7 +6,6 @@
 #include <filesystem>
 #include <string>
 #include <fstream>
-#include "Bitmap.hpp"
 
 namespace fs = std::filesystem;
 using namespace std;
@@ -15,19 +14,22 @@ using namespace std;
 class FileManager {
     
 private:
-    fs::path m_readFile;
-    fs::path m_writePath;
+    
+    fs::path m_srcPath;
+    fs::path m_destinationPath;
     uint8_t* m_bytes;
     streampos m_fileSize;
     
+    
 public:
     
-    FileManager(fs::path readPath, fs::path writePath);
+    FileManager(fs::path srcPath);
+    FileManager(fs::path srcPath, fs::path destinationPath);
     ~FileManager();
     
     void readBinaryData();
     void setFilenameAppendix(string appendix="");
-    void writeBitmap(Bitmap* bmp);
+    void writeBitmap(uint8_t* header, size_t headerSize, uint8_t* pxData, size_t byteLength);
     uint8_t* getBytes() { return m_bytes; }
     size_t getFilesize() { return (size_t)m_fileSize; }
 };

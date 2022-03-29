@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		A901DB8327F1B6F1004CCBF5 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A901DB8227F1B6F1004CCBF5 /* main.cpp */; };
 		A901DB8B27F1B765004CCBF5 /* Bitmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A901DB8927F1B765004CCBF5 /* Bitmap.cpp */; };
+		A90F5F3727F3282F0096FCAA /* FileManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A90F5F3527F3282F0096FCAA /* FileManager.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -28,6 +29,8 @@
 		A901DB8227F1B6F1004CCBF5 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		A901DB8927F1B765004CCBF5 /* Bitmap.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Bitmap.cpp; sourceTree = "<group>"; };
 		A901DB8A27F1B765004CCBF5 /* Bitmap.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Bitmap.hpp; sourceTree = "<group>"; };
+		A90F5F3527F3282F0096FCAA /* FileManager.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FileManager.cpp; sourceTree = "<group>"; };
+		A90F5F3627F3282F0096FCAA /* FileManager.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FileManager.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +65,7 @@
 			isa = PBXGroup;
 			children = (
 				A901DB8C27F1B779004CCBF5 /* Bitmap */,
+				A90F5F3827F328420096FCAA /* FileManager */,
 			);
 			path = lib;
 			sourceTree = "<group>";
@@ -73,6 +77,15 @@
 				A901DB8A27F1B765004CCBF5 /* Bitmap.hpp */,
 			);
 			path = Bitmap;
+			sourceTree = "<group>";
+		};
+		A90F5F3827F328420096FCAA /* FileManager */ = {
+			isa = PBXGroup;
+			children = (
+				A90F5F3527F3282F0096FCAA /* FileManager.cpp */,
+				A90F5F3627F3282F0096FCAA /* FileManager.hpp */,
+			);
+			path = FileManager;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -132,6 +145,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A90F5F3727F3282F0096FCAA /* FileManager.cpp in Sources */,
 				A901DB8B27F1B765004CCBF5 /* Bitmap.cpp in Sources */,
 				A901DB8327F1B6F1004CCBF5 /* main.cpp in Sources */,
 			);

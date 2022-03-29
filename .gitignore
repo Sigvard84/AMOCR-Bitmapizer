@@ -34,3 +34,7 @@
 # Mac files
 *.DS_STORE
 *.xcodeproj
+
+# Img/bin folders:
+/bin-img
+/bmp-img

@@ -217,8 +217,7 @@ void Bitmap::createHeader() {
     m_header[52] = 0;
     m_header[53] = 0;
     
-    
-    //TODO: colour table(s)
+    createColourTable();
     
 }
 
@@ -277,9 +276,27 @@ void Bitmap::convertFrom8To4Bit() {
     m_pxData = newPxData;
     
     setNumberOfColours();
+    createHeader();
 }
 
 
 void Bitmap::createColourTable() {
+    
+    if (m_headerSize == 54) {
+        return;
+    }
+    
+    int startIndex = 54; // Header ends at index 53.
+    int incrementSize = 256 / (m_numberOfColours - 1);
+    uint8_t colorValue = 0;
+    
+    for (; startIndex < m_headerSize; startIndex++) {
+        m_header[startIndex] = colorValue; // Red
+        m_header[++startIndex] = colorValue; // Green
+        m_header[++startIndex] = colorValue; // Blue
+        m_header[++startIndex] = 0; // Reserved (= 0)
+        
+        colorValue += incrementSize;
+    }
     
 }

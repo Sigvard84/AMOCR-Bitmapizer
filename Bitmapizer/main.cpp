@@ -41,6 +41,7 @@ int main(int argc, const char * argv[]) {
     FileManager fm2(bmpPath, destinationPath);
     
     fm2.setFilenameAppendix("-testgray");
+    bmp2.convertFrom8To4Bit();
     fm2.writeBitmap(bmp2.m_header, bmp2.m_headerSize, bmp2.m_pxData, bmp2.m_byteLength);
     
     

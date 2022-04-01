@@ -2,30 +2,31 @@
 
 Bitmap::Bitmap(fs::path srcFile) {
     
+    // Open file and load its data:
     FileManager fm(srcFile);
-    
     fm.readBinaryData();
     uint8_t* fileBytes = fm.getBytes();
     
+    // Read data on pixel dimensions and colour depth:
     m_width = fileBytes[18] + (fileBytes[19] << 8) + (fileBytes[20] << 16) + (fileBytes[21] << 24);
     m_height = fileBytes[22] + (fileBytes[23] << 8) + (fileBytes[24] << 16) + (fileBytes[25] << 24);
     m_bitsPerPx = fileBytes[28];
     
+    // Calculate how much padding the image has:
     m_paddingAmount = ((4 - (int(m_width) * (m_bitsPerPx/8)) % 4) % 4);
     
     setNumberOfColours();
     setHeaderData();
     
+    // Read data on image file size and calculate byte length of the raster data:
     m_fileSize = fileBytes[2] + (fileBytes[3] << 8) + (fileBytes[4] << 16) + (fileBytes[5] << 24);
     m_byteLength = m_fileSize - m_headerSize;
-    m_fileSize = m_headerSize + m_byteLength;
         
-    createHeader();
+    loadHeaderFromBmp(fileBytes);
     
     uint8_t* pxDataStart = &fileBytes[m_headerSize];
     getPixelsFromBmp(pxDataStart);
 }
-
 
 
 Bitmap::Bitmap(size_t width, size_t height, size_t byteLength, uint8_t bitsPerPx, const uint8_t* pxData) {
@@ -130,6 +131,14 @@ void Bitmap::setHeaderData() {
 }
 
 
+void Bitmap::loadHeaderFromBmp(const uint8_t* bmpFile) {
+    
+    for (int i = 0; i < m_headerSize; i++) {
+        m_header[i] = bmpFile[i];
+    }
+}
+
+
 void Bitmap::createHeader() {
     
     // FILE HEADER //
@@ -214,4 +223,63 @@ void Bitmap::createHeader() {
 }
 
 
+void Bitmap::convertFrom8To4Bit() {
+    
+    if (m_bitsPerPx != 8) {
+        return;
+    }
+    
+    const int bitsPerPx = 4;
+    
+    // Calculate new padding:
+    const int newPaddingAmount = ((4 - (int(m_width) * (bitsPerPx/8)) % 4) % 4);
+    size_t paddingBytes = m_paddingAmount * m_height;
+    
+    // Create new array to store the pixels in:
+    uint8_t* newPxData;
+    size_t extraByte = m_byteLength % 2 == 0 ? 0 : 1; // In case we need an extra half-byte (odd numbers)
+    size_t newByteLength = (m_byteLength - paddingBytes)/2 + (newPaddingAmount * m_height) + extraByte;
+    newPxData = new uint8_t[newByteLength];
+    
+    
+    // Get the pixel data with added padding:
+    for (int i = 0; i < newByteLength; i++) {
+        
+        int j = i * 2; // index for the old pxData
+        
+        uint8_t byte1 = m_pxData[j]/16;
+        uint8_t byte2;
+        
+        if (newPaddingAmount != 0 && (j != 0 && j % m_width == 0)) {
+            byte2 = 0; // Padding
+        } else {
+            byte2 = m_pxData[j+1]/16;
+        }
+        
+        newPxData[i] = byte1 << 4 | byte2;
+        
+        int nextPxNumber = j + 2;
+        
+        if (nextPxNumber % m_width == 0) {
+            for (int padPx = 1; padPx <= newPaddingAmount; padPx++) {
+                newPxData[i+padPx] = 0;
+            }
+            i += newPaddingAmount;
+        }
+    }
+    
+    // Update member variables:
+    m_bitsPerPx = bitsPerPx;
+    m_paddingAmount = newPaddingAmount;
+    m_byteLength = newByteLength;
+    
+    delete [] m_pxData;
+    m_pxData = newPxData;
+    
+    setNumberOfColours();
+}
 
+
+void Bitmap::createColourTable() {
+    
+}

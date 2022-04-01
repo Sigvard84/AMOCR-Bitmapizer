@@ -21,11 +21,13 @@ private:
     int m_paddingAmount;
     
     void createHeader();
+    void loadHeaderFromBmp(const uint8_t* bmpFile);
     void getPixels(const uint8_t* pxData);
     void getPixelsFromBmp(const uint8_t* pxData);
     void setNumberOfColours();
     void setHeaderData();
-    
+    void createColourTable();
+        
     
 public:
     
@@ -38,6 +40,7 @@ public:
     Bitmap(size_t width, size_t height, size_t byteLength, uint8_t bitsPerPx, const uint8_t* pxData);
     ~Bitmap();
     
+    void convertFrom8To4Bit();
 
 };
 

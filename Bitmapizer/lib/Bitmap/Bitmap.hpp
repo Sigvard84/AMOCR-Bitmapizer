@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <cstddef>
 #include <filesystem>
+#include <cmath>
 #include "FileManager.hpp"
 
 namespace fs = std::filesystem;
@@ -17,6 +18,7 @@ private:
     size_t m_width, m_height, m_fileSize;
     uint8_t m_bitsPerPx;
     uint8_t* m_colourTable;
+    uint8_t* m_padFreePxData;
     int m_numberOfColours;
     int m_paddingAmount;
     
@@ -27,6 +29,7 @@ private:
     void setNumberOfColours();
     void setHeaderData();
     void createColourTable();
+    void getPadFreePxData();
         
     
 public:

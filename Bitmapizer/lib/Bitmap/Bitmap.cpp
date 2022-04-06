@@ -265,35 +265,27 @@ void Bitmap::convertFrom8To4Bit() {
     newPxData = new uint8_t[newByteLength];
     
     getPadFreePxData();
-    
-    int pxCounter = 0;
-    
-    
+     
     // Get the pixel data with added padding:
-    for (int i = 0; i < newByteLength; i++) {
+    for (int newIx = 0, oldIx = 0; newIx < newByteLength; newIx++, oldIx++) {
         
-        uint8_t byte1 = m_padFreePxData[pxCounter]/16;
+        uint8_t byte1 = m_padFreePxData[oldIx]/16;
         uint8_t byte2;
         
-        if (newPaddingAmount > 0 && (pxCounter != 0 && pxCounter % m_width == 0)) {
+        if (newPaddingAmount > 0 && (oldIx != 0 && (oldIx+1) % m_width == 0)) {
             byte2 = 0; // Padding
-            pxCounter++;
+            
         } else {
-            pxCounter++;
-            byte2 = m_padFreePxData[pxCounter]/16;
+            byte2 = m_padFreePxData[++oldIx]/16;
         }
         
-        newPxData[i] = byte1 << 4 | byte2;
+        newPxData[newIx] = byte1 << 4 | byte2;
         
-        //int nextPxNumber = pxCounter + 1;
-        
-        if (pxCounter % m_width == 0) {
+        if ((oldIx+1) % m_width == 0) {
             for (int padPx = 1; padPx <= newPaddingAmount; padPx++) {
-                newPxData[i+padPx] = 0;
+                newPxData[newIx+padPx] = 0;
             }
-            i += newPaddingAmount;
-        } else {
-            pxCounter	++;
+            newIx += newPaddingAmount;
         }
     }
     

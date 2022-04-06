@@ -40,7 +40,7 @@ int main(int argc, const char * argv[]) {
     Bitmap bmp2(bmpPath);
     FileManager fm2(bmpPath, destinationPath);
     
-    fm2.setFilenameAppendix("-testpadding");
+    fm2.setFilenameAppendix("-testpadding2");
     bmp2.convertFrom8To4Bit();
     fm2.writeBitmap(bmp2.m_header, bmp2.m_headerSize, bmp2.m_pxData, bmp2.m_byteLength);
     

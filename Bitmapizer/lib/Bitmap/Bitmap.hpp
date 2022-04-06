@@ -44,6 +44,7 @@ public:
     ~Bitmap();
     
     void convertFrom8To4Bit();
+    void convertFrom8To2Bit();
 
 };
 

@@ -243,6 +243,90 @@ void Bitmap::getPadFreePxData() {
 }
 
 
+void Bitmap::convertFrom8To2Bit() {
+    
+    if (m_bitsPerPx != 8) {
+        return;
+    }
+    
+    const int bitsPerPx = 2;
+    const float paddingRatio = float(m_width) * float(bitsPerPx/8.0);
+    
+    // Calculate new padding:
+    const float newPaddingAmount = fmod(4 - fmod(paddingRatio, 4.0), 4.0);
+    const int newPaddingBytes = newPaddingAmount * m_height;
+    size_t oldPaddingBytes = m_paddingAmount * m_height;
+    bool shouldBePadded = newPaddingAmount > 0;
+    
+    // Create new array to store the pixels in:
+    uint8_t* newPxData;
+    size_t newByteLength = (m_byteLength - oldPaddingBytes)/4 + newPaddingBytes;
+    newPxData = new uint8_t[newByteLength];
+    
+    getPadFreePxData();
+     
+    // Get the pixel data with added padding:
+    for (int newIx = 0, oldIx = 0; newIx < newByteLength; newIx++, oldIx++) {
+        
+        uint8_t byte1 = m_padFreePxData[oldIx]/64;
+        uint8_t byte2;
+        uint8_t byte3;
+        uint8_t byte4;
+        
+        if (shouldBePadded) {
+            if (oldIx != 0 && (oldIx+1) % m_width == 0) {
+                byte2 = 0; // Padding
+                byte3 = 0; // Padding
+                byte4 = 0; // Padding
+            } else {
+                byte2 = m_padFreePxData[++oldIx]/64;
+                
+                if ((oldIx+1) % m_width == 0) {
+                    byte3 = 0; // Padding
+                    byte4 = 0; // Padding
+                } else {
+                    byte3 = m_padFreePxData[++oldIx]/64;
+                    
+                    if ((oldIx+1) % m_width == 0) {
+                        byte4 = 0; // Padding
+                    } else {
+                        byte4 = m_padFreePxData[++oldIx]/64;
+                    }
+                }
+            }
+            
+        } else {
+            byte2 = m_padFreePxData[++oldIx]/64;
+            byte3 = m_padFreePxData[++oldIx]/64;
+            byte4 = m_padFreePxData[++oldIx]/64;
+        }
+        
+        newPxData[newIx] = byte1 << 6 | byte2 << 4 | byte3 << 2 | byte4;
+        
+        // Add padding to whole bytes:
+        if ((oldIx+1) % m_width == 0) {
+            for (int padPx = 1; padPx <= newPaddingAmount; padPx++) {
+                newPxData[newIx+padPx] = 0;
+            }
+            newIx += newPaddingAmount;
+        }
+    }
+    
+    // Update member variables:
+    m_bitsPerPx = bitsPerPx;
+    m_paddingAmount = newPaddingAmount;
+    m_byteLength = newByteLength;
+    
+    delete [] m_pxData;
+    m_pxData = newPxData;
+    
+    setNumberOfColours();
+    setHeaderData();
+    m_fileSize = m_headerSize + m_byteLength;
+    createHeader();
+}
+
+
 void Bitmap::convertFrom8To4Bit() {
     
     if (m_bitsPerPx != 8) {
@@ -253,15 +337,13 @@ void Bitmap::convertFrom8To4Bit() {
     const float paddingRatio = float(m_width) * float(bitsPerPx/8.0);
     
     // Calculate new padding:
-    //const int newPaddingAmount = (4 - (int(m_width) * ((bitsPerPx)/8)) % 4) % 4;
     const float newPaddingAmount = fmod(4 - fmod(paddingRatio, 4.0), 4.0);
     const int newPaddingBytes = newPaddingAmount * m_height;
     size_t oldPaddingBytes = m_paddingAmount * m_height;
     
     // Create new array to store the pixels in:
     uint8_t* newPxData;
-    //size_t extraByte = m_byteLength % 2 == 0 ? 0 : 1; // In case we need an extra half-byte (odd numbers)
-    size_t newByteLength = (m_byteLength - oldPaddingBytes)/2 + newPaddingBytes;// + extraByte;
+    size_t newByteLength = (m_byteLength - oldPaddingBytes)/2 + newPaddingBytes;
     newPxData = new uint8_t[newByteLength];
     
     getPadFreePxData();
@@ -281,6 +363,7 @@ void Bitmap::convertFrom8To4Bit() {
         
         newPxData[newIx] = byte1 << 4 | byte2;
         
+        // Add padding to whole bytes:
         if ((oldIx+1) % m_width == 0) {
             for (int padPx = 1; padPx <= newPaddingAmount; padPx++) {
                 newPxData[newIx+padPx] = 0;

@@ -243,6 +243,142 @@ void Bitmap::getPadFreePxData() {
 }
 
 
+void Bitmap::convertFrom8To1Bit() {
+    
+    if (m_bitsPerPx != 8) {
+        return;
+    }
+    
+    const int bitsPerPx = 1;
+    const float bytesPerRow = float(m_width) * float(bitsPerPx/8.0);
+    
+    // Calculate new padding:
+    const float newPaddingAmount = floor(fmod(4 - fmod(bytesPerRow, 4.0), 4.0));
+    const int newPaddingBytes = newPaddingAmount * m_height;
+    
+    // Create new array to store the pixels in:
+    uint8_t* newPxData;
+    size_t newByteLength = (ceil(bytesPerRow) * m_height) + newPaddingBytes;
+    newPxData = new uint8_t[newByteLength];
+    
+    getPadFreePxData();
+     
+    bool shouldBePadded = newPaddingAmount > 0;
+    
+    // Get the pixel data with added padding:
+    for (int newIx = 0, oldIx = 0; newIx < newByteLength; newIx++, oldIx++) {
+        
+        uint8_t byte1 = m_padFreePxData[oldIx]/128;
+        uint8_t byte2;
+        uint8_t byte3;
+        uint8_t byte4;
+        uint8_t byte5;
+        uint8_t byte6;
+        uint8_t byte7;
+        uint8_t byte8;
+        
+        if (shouldBePadded) {
+            if ((oldIx+1) % m_width == 0) {
+                byte2 = 0; // Padding
+                byte3 = 0; // Padding
+                byte4 = 0; // Padding
+                byte5 = 0; // Padding
+                byte6 = 0; // Padding
+                byte7 = 0; // Padding
+                byte8 = 0; // Padding
+                
+            } else {
+                byte2 = m_padFreePxData[++oldIx]/128;
+                
+                if ((oldIx+1) % m_width == 0) {
+                    byte3 = 0; // Padding
+                    byte4 = 0; // Padding
+                    byte5 = 0; // Padding
+                    byte6 = 0; // Padding
+                    byte7 = 0; // Padding
+                    byte8 = 0; // Padding
+                } else {
+                    byte3 = m_padFreePxData[++oldIx]/128;
+                    
+                    if ((oldIx+1) % m_width == 0) {
+                        byte4 = 0; // Padding
+                        byte5 = 0; // Padding
+                        byte6 = 0; // Padding
+                        byte7 = 0; // Padding
+                        byte8 = 0; // Padding
+                    } else {
+                        byte4 = m_padFreePxData[++oldIx]/128;
+                        
+                        if ((oldIx+1) % m_width == 0) {
+                            byte5 = 0; // Padding
+                            byte6 = 0; // Padding
+                            byte7 = 0; // Padding
+                            byte8 = 0; // Padding
+                        } else {
+                            byte5 = m_padFreePxData[++oldIx]/128;
+                            
+                            if ((oldIx+1) % m_width == 0) {
+                                byte6 = 0; // Padding
+                                byte7 = 0; // Padding
+                                byte8 = 0; // Padding
+                            } else {
+                                byte6 = m_padFreePxData[++oldIx]/128;
+                                
+                                if ((oldIx+1) % m_width == 0) {
+                                    byte7 = 0; // Padding
+                                    byte8 = 0; // Padding
+                                } else {
+                                    byte7 = m_padFreePxData[++oldIx]/128;
+                                    
+                                    if ((oldIx+1) % m_width == 0) {
+                                        byte8 = 0; // Padding
+                                    } else {
+                                        byte8 = m_padFreePxData[++oldIx]/128;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+        } else {
+            byte2 = m_padFreePxData[++oldIx]/128;
+            byte3 = m_padFreePxData[++oldIx]/128;
+            byte4 = m_padFreePxData[++oldIx]/128;
+            byte5 = m_padFreePxData[++oldIx]/128;
+            byte6 = m_padFreePxData[++oldIx]/128;
+            byte7 = m_padFreePxData[++oldIx]/128;
+            byte8 = m_padFreePxData[++oldIx]/128;
+        }
+        
+        newPxData[newIx] = byte1 << 7 | byte2 << 6 | byte3 << 5 | byte4 << 4 | byte5 << 3 | byte6 << 2 | byte7 << 1 | byte8;
+        
+        // Add padding to whole bytes:
+        if ((oldIx+1) % m_width == 0) {
+            for (int padPx = 1; padPx <= newPaddingAmount; padPx++) {
+                newPxData[newIx+padPx] = 0;
+            }
+            newIx += newPaddingAmount;
+        }
+    }
+    
+    // Update member variables:
+    m_bitsPerPx = bitsPerPx;
+    m_paddingAmount = newPaddingAmount;
+    m_byteLength = newByteLength;
+    
+    delete [] m_pxData;
+    m_pxData = newPxData;
+    
+    setNumberOfColours();
+    setHeaderData();
+    m_fileSize = m_headerSize + m_byteLength;
+    createHeader();
+    
+}
+
+
 void Bitmap::convertFrom8To2Bit() {
     
     if (m_bitsPerPx != 8) {
@@ -393,7 +529,7 @@ void Bitmap::createColourTable() {
     }
     
     int startIndex = 54; // Header ends at index 53.
-    int incrementSize = 256 / (m_numberOfColours - 1);
+    int incrementSize = 255 / (m_numberOfColours - 1);
     uint8_t colorValue = 0;
     
     for (; startIndex < m_headerSize; startIndex++) {

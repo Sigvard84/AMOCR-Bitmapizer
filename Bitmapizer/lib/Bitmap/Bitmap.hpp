@@ -45,6 +45,7 @@ public:
     
     void convertFrom8To4Bit();
     void convertFrom8To2Bit();
+    void convertFrom8To1Bit();
 
 };
 

@@ -337,13 +337,12 @@ void Bitmap::convertFrom8To4Bit() {
     const float bytesPerRow = float(m_width) * float(bitsPerPx/8.0);
     
     // Calculate new padding:
-    const float newPaddingAmount = fmod(4 - fmod(bytesPerRow, 4.0), 4.0);
+    const float newPaddingAmount = floor(fmod(4 - fmod(bytesPerRow, 4.0), 4.0));
     const int newPaddingBytes = newPaddingAmount * m_height;
-    size_t oldPaddingBytes = m_paddingAmount * m_height;
     
     // Create new array to store the pixels in:
     uint8_t* newPxData;
-    size_t newByteLength = (m_byteLength - oldPaddingBytes)/2 + newPaddingBytes;
+    size_t newByteLength = (ceil(bytesPerRow) * m_height) + newPaddingBytes;
     newPxData = new uint8_t[newByteLength];
     
     getPadFreePxData();

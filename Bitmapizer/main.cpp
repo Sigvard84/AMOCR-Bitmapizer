@@ -15,7 +15,7 @@ using namespace std;
 int main(int argc, const char * argv[]) {
     
     // From which file to open test bmp:
-    string bmpPath = fs::path("/Users/fsjolander/Documents/JTH/VT_2022/Bachelor_Thesis/Applications/AMOCR-desktop/bmp_images/grayscale/cropped/picture231-256.bmp");
+    string bmpPath = fs::path("/Users/fsjolander/Documents/JTH/VT_2022/Bachelor_Thesis/Applications/AMOCR-desktop/bmp_images/grayscale/picture231.bmp");
     
     // From which folder to open the binary files:
     string srcPath = fs::path("/Users/fsjolander/Documents/JTH/VT_2022/Bachelor_Thesis/Applications/AMOCR-Bitmapizer/bin-img");
@@ -40,7 +40,7 @@ int main(int argc, const char * argv[]) {
     Bitmap bmp2(bmpPath);
     FileManager fm2(bmpPath, destinationPath);
     
-    fm2.setFilenameAppendix("_2bit_140");
+    fm2.setFilenameAppendix("_2bit_800");
     bmp2.convertFrom8To2Bit();
     fm2.writeBitmap(bmp2.m_header, bmp2.m_headerSize, bmp2.m_pxData, bmp2.m_byteLength);
     

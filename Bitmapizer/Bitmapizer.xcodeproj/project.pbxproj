@@ -31,6 +31,7 @@
 		A901DB8A27F1B765004CCBF5 /* Bitmap.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Bitmap.hpp; sourceTree = "<group>"; };
 		A90F5F3527F3282F0096FCAA /* FileManager.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FileManager.cpp; sourceTree = "<group>"; };
 		A90F5F3627F3282F0096FCAA /* FileManager.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = FileManager.hpp; sourceTree = "<group>"; };
+		A910B88D280050B800A6EE72 /* functions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = functions.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,6 +67,7 @@
 			children = (
 				A901DB8C27F1B779004CCBF5 /* Bitmap */,
 				A90F5F3827F328420096FCAA /* FileManager */,
+				A910B88D280050B800A6EE72 /* functions.h */,
 			);
 			path = lib;
 			sourceTree = "<group>";

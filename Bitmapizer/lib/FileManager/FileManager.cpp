@@ -19,8 +19,8 @@ FileManager::FileManager(fs::path srcPath, fs::path destinationPath) {
         
     auto directoryWasCreated = std::filesystem::create_directory(destinationPath);
     
-    if (not directoryWasCreated) {
-        std::cout << "Directory not created" << endl;
+    if (directoryWasCreated) {
+        std::cout << "Directory created: " << destinationPath << endl;
     }
     
 }

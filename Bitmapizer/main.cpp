@@ -15,13 +15,13 @@ using namespace std;
 int main(int argc, const char * argv[]) {
     
     // From which file to open test bmp:
-    string bmpPath = fs::path("/Users/fsjolander/Documents/JTH/VT_2022/Bachelor_Thesis/Applications/AMOCR-desktop/bmp_images/grayscale/cropped/picture231.bmp");
+    string bmpPath = fs::path("/Users/fsjolander/Documents/JTH/VT_2022/Bachelor_Thesis/Applications/AMOCR-desktop/bmp_images/grayscale/cropped/_testImage.bmp");
     
     // From which folder to open the binary files:
     string srcPath = fs::path("/Users/fsjolander/Documents/JTH/VT_2022/Bachelor_Thesis/Applications/AMOCR-Bitmapizer/bin-img");
     
     // To which folder to save the resulting bmp files:
-    string destinationPath = fs::path("/Users/fsjolander/Documents/JTH/VT_2022/Bachelor_Thesis/Applications/AMOCR-Bitmapizer/bmp-img");
+    string destinationPath = fs::path("/Users/fsjolander/Documents/JTH/VT_2022/Bachelor_Thesis/Applications/AMOCR-Bitmapizer/testfolder");
     
     
 //    for (const auto &srcFile : fs::directory_iterator(srcPath)) {
@@ -40,7 +40,7 @@ int main(int argc, const char * argv[]) {
     Bitmap bmp2(bmpPath);
     FileManager fm2(bmpPath, destinationPath);
     
-    fm2.setFilenameAppendix("_1bit_139");
+    fm2.setFilenameAppendix("_1bit_test");
     bmp2.convertFrom8To1Bit();
     fm2.writeBitmap(bmp2.m_header, bmp2.m_headerSize, bmp2.m_pxData, bmp2.m_byteLength);
     

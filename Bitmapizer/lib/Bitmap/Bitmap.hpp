@@ -17,8 +17,8 @@ private:
     
     size_t m_width, m_height, m_fileSize;
     uint8_t m_bitsPerPx;
-    uint8_t* m_colourTable;
-    uint8_t* m_padFreePxData;
+    uint8_t* m_colourTable = nullptr;
+    uint8_t* m_padFreePxData = nullptr;
     int m_numberOfColours;
     int m_paddingAmount;
     
@@ -34,8 +34,8 @@ private:
     
 public:
     
-    uint8_t* m_header;
-    uint8_t* m_pxData;
+    uint8_t* m_header = nullptr;
+    uint8_t* m_pxData = nullptr;
     size_t m_byteLength;
     size_t m_headerSize;
     

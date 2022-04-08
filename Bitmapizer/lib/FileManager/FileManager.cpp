@@ -36,6 +36,7 @@ FileManager::~FileManager() {
 
 void FileManager::setFilenameAppendix(string appendix) {
     
+    m_appendix = appendix;
     string srcPath = m_srcPath;
     
     // Get the name of the binary file:
@@ -43,10 +44,21 @@ void FileManager::setFilenameAppendix(string appendix) {
     string::size_type const p(srcFileName.find_last_of('.'));
     
     // Set the name of the bmp file to save:
-    string bmpFileName = srcFileName.substr(0, p) + appendix + ".bmp";
+    string bmpFileName = srcFileName.substr(0, p) + m_appendix + ".bmp";
     
     // Update m_writePath:
     m_destinationPath += "/" + bmpFileName;
+    
+    m_fileNameCreated = true;
+}
+
+
+void FileManager::setFilename(string orgName, string colourDepth, string sizePercent) {
+    
+    string filename = orgName + "_" + colourDepth + "_" + sizePercent + ".bmp";
+    m_destinationPath += "/" + filename;
+    
+    m_fileNameCreated = true;
 }
 
 
@@ -69,6 +81,10 @@ void FileManager::readBinaryData() {
 
 
 void FileManager::writeBitmap(uint8_t* header, size_t headerSize, uint8_t* pxData, size_t byteLength) {
+    
+    if (!m_fileNameCreated) {
+        setFilenameAppendix();
+    }
     
     fstream bmpFile;
     bmpFile.open(m_destinationPath, ios::app | ios::binary);

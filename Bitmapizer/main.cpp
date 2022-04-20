@@ -12,6 +12,8 @@ int main(int argc, const char * argv[]) {
         arg = argv[1];
     }
     
+    //arg = "-convert";
+    
     int action = 0;
     
     if (arg == "-bitmapize") {

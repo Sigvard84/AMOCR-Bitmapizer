@@ -250,15 +250,19 @@ void Bitmap::convertFrom8To1Bit() {
     }
     
     const int bitsPerPx = 1;
-    const float bytesPerRow = float(m_width) * float(bitsPerPx/8.0);
+    //const float bytesPerRow = float(m_width) * float(bitsPerPx/8.0);
+    const int bitsPerRow = m_width * bitsPerPx;
     
     // Calculate new padding:
-    const float newPaddingAmount = floor(fmod(4 - fmod(bytesPerRow, 4.0), 4.0));
-    const int newPaddingBytes = newPaddingAmount * m_height;
+    const int newPaddingAmount = (32 - (bitsPerRow % 32)) % 32;
+    //const float newPaddingAmount = floor(fmod(4 - fmod(bytesPerRow, 4.0), 4.0));
+    //const int newPaddingBytes = newPaddingAmount * m_height;
+    const int bytesPerRow = (bitsPerRow + newPaddingAmount) / 8;
     
     // Create new array to store the pixels in:
     uint8_t* newPxData;
-    size_t newByteLength = (ceil(bytesPerRow) * m_height) + newPaddingBytes;
+    size_t newByteLength = bytesPerRow * m_height;
+    //size_t newByteLength = (ceil(bytesPerRow) * m_height) + newPaddingBytes;
     newPxData = new uint8_t[newByteLength];
     
     getPadFreePxData();
@@ -356,16 +360,16 @@ void Bitmap::convertFrom8To1Bit() {
         
         // Add padding to whole bytes:
         if ((oldIx+1) % m_width == 0) {
-            for (int padPx = 1; padPx <= newPaddingAmount; padPx++) {
+            for (int padPx = 1; padPx <= newPaddingAmount/8; padPx++) {
                 newPxData[newIx+padPx] = 0;
             }
-            newIx += newPaddingAmount;
+            newIx += newPaddingAmount/8;
         }
     }
     
     // Update member variables:
     m_bitsPerPx = bitsPerPx;
-    m_paddingAmount = newPaddingAmount;
+    m_paddingAmount = newPaddingAmount/8;
     m_byteLength = newByteLength;
     
     delete [] m_pxData;
@@ -386,15 +390,20 @@ void Bitmap::convertFrom8To2Bit() {
     }
     
     const int bitsPerPx = 2;
-    const float bytesPerRow = float(m_width) * float(bitsPerPx/8.0);
+    //const float bytesPerRow = float(m_width) * float(bitsPerPx/8.0);
+    const int bitsPerRow = m_width * bitsPerPx;
+    
     
     // Calculate new padding:
-    const float newPaddingAmount = floor(fmod(4 - fmod(bytesPerRow, 4.0), 4.0));
-    const int newPaddingBytes = newPaddingAmount * m_height;
+    const int newPaddingAmount = (32 - (bitsPerRow % 32)) % 32;
+    //const float newPaddingAmount = floor(fmod(4 - fmod(bytesPerRow, 4.0), 4.0));
+    //const int newPaddingBytes = newPaddingAmount * m_height;
+    const int bytesPerRow = (bitsPerRow + newPaddingAmount) / 8; // TODO: what if uneven? Ceiling?
     
     // Create new array to store the pixels in:
     uint8_t* newPxData;
-    size_t newByteLength = (ceil(bytesPerRow) * m_height) + newPaddingBytes;
+    size_t newByteLength = bytesPerRow * m_height;
+    //size_t newByteLength = (ceil(bytesPerRow) * m_height) + newPaddingBytes;
     newPxData = new uint8_t[newByteLength];
     
     getPadFreePxData();
@@ -410,20 +419,20 @@ void Bitmap::convertFrom8To2Bit() {
         uint8_t byte4;
         
         if (shouldBePadded) {
-            if ((oldIx+1) % m_width == 0) {
+            if ((oldIx+1) % m_width == 0) { //oldIx+1
                 byte2 = 0; // Padding
                 byte3 = 0; // Padding
                 byte4 = 0; // Padding
             } else {
                 byte2 = m_padFreePxData[++oldIx]/64;
                 
-                if ((oldIx+1) % m_width == 0) {
+                if ((oldIx+1) % m_width == 0) { //oldIx+1
                     byte3 = 0; // Padding
                     byte4 = 0; // Padding
                 } else {
                     byte3 = m_padFreePxData[++oldIx]/64;
                     
-                    if ((oldIx+1) % m_width == 0) {
+                    if ((oldIx+1) % m_width == 0) { //oldIx+1
                         byte4 = 0; // Padding
                     } else {
                         byte4 = m_padFreePxData[++oldIx]/64;
@@ -441,16 +450,16 @@ void Bitmap::convertFrom8To2Bit() {
         
         // Add padding to whole bytes:
         if ((oldIx+1) % m_width == 0) {
-            for (int padPx = 1; padPx <= newPaddingAmount; padPx++) {
+            for (int padPx = 1; padPx <= newPaddingAmount/8; padPx++) {
                 newPxData[newIx+padPx] = 0;
             }
-            newIx += newPaddingAmount;
+            newIx += newPaddingAmount/8;
         }
     }
     
     // Update member variables:
     m_bitsPerPx = bitsPerPx;
-    m_paddingAmount = newPaddingAmount;
+    m_paddingAmount = newPaddingAmount/8;
     m_byteLength = newByteLength;
     
     delete [] m_pxData;

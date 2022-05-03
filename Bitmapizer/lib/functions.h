@@ -54,54 +54,80 @@ void convert() {
             readPaths.push_back(srcFolder.path());
     }
     
-    for (const auto &srcFolder : readPaths) {
+    for (const auto &pptFolder : readPaths) {
         
-        string sizePercent = srcFolder.string().substr(srcFolder.string().find_last_of("/\\") + 1);
+        string sizePercent = pptFolder.string().substr(pptFolder.string().find_last_of("/\\") + 1);
         
-        for (const auto &srcFile : fs::directory_iterator(srcFolder)) {
+        for (const auto &imgFolder : fs::directory_iterator(pptFolder)) {
             
-            string filePath = srcFile.path().string();
-            string fileName = filePath.substr(filePath.find_last_of("/\\") + 1);
-            string::size_type const dot(fileName.find_last_of('.'));
+            //string imageFolder = imgFolder.path().string().substr(imgFolder.path().string().find_last_of("/\\") + 1);
             
-            if (fileName.substr(dot, 4) == ".bmp") {
+            for (const auto &srcFile : fs::directory_iterator(imgFolder)) {
                 
-                string::size_type const underscore(fileName.find_first_of("_"));
-                string orgFilename = fileName.substr(0, underscore);
+                string filePath = srcFile.path().string();
+                string fileName = filePath.substr(filePath.find_last_of("/\\") + 1);
+                string::size_type const dot(fileName.find_last_of('.'));
                 
-                //************************************** Convert to 4 bit bmp **************************************
-                string colourDepth = "4bit";
-                string destinationPath = fs::path(folderRootPath + "/" + colourDepth + "/" + sizePercent);
+                if (fileName.substr(dot, 4) == ".bmp") {
+                    
+                    string::size_type const underscore(fileName.find_first_of("_"));
+                    string orgFilename = fileName.substr(0, underscore);
+                    
+                    //************************************* Create 8 bit bin files *************************************
+                    string colourDepth = "8bit";
+                    string imageFolder = orgFilename + "_" + colourDepth + "_" + sizePercent;
+                    string destinationPath = fs::path(folderRootPath + "/" + colourDepth + "/" + sizePercent + "/" + imageFolder);
+                    
+                    Bitmap bmp8bit(srcFile);
+                    FileManager fm8bit(srcFile, destinationPath);
+                    
+                    fm8bit.setFilename(orgFilename, colourDepth, sizePercent);
+                    fm8bit.writeBinFile(bmp8bit.m_pxData, bmp8bit.m_byteLength);
+                    
+                    //************************************** Convert to 4 bit bmp **************************************
+                    colourDepth = "4bit";
+                    imageFolder = orgFilename + "_" + colourDepth + "_" + sizePercent;
+                    destinationPath = fs::path(folderRootPath + "/" + colourDepth + "/" + sizePercent + "/" + imageFolder);
+                    
+                    Bitmap bmp4bit(srcFile);
+                    FileManager fm4bit(srcFile, destinationPath);
+                    
+                    fm4bit.setFilename(orgFilename, colourDepth, sizePercent);
+                    bmp4bit.convertFrom8To4Bit();
+                    fm4bit.writeBitmap(bmp4bit.m_header, bmp4bit.m_headerSize, bmp4bit.m_pxData, bmp4bit.m_byteLength);
+                    fm4bit.writeBinFile(bmp4bit.m_pxData, bmp4bit.m_byteLength);
+                    
+                    //************************************** Convert to 2 bit bmp **************************************
+                    colourDepth = "2bit";
+                    imageFolder = orgFilename + "_" + colourDepth + "_" + sizePercent;
+                    destinationPath = fs::path(folderRootPath + "/" + colourDepth + "/" + sizePercent + "/" + imageFolder);
+                    
+                    Bitmap bmp2bit(srcFile);
+                    FileManager fm2bit(srcFile, destinationPath);
+                    
+                    fm2bit.setFilename(orgFilename, colourDepth, sizePercent);
+                    bmp2bit.convertFrom8To2Bit();
+                    fm2bit.writeBitmap(bmp2bit.m_header, bmp2bit.m_headerSize, bmp2bit.m_pxData, bmp2bit.m_byteLength);
+                    fm2bit.writeBinFile(bmp2bit.m_pxData, bmp2bit.m_byteLength);
+                    
+                    //************************************** Convert to 1 bit bmp **************************************
+                    colourDepth = "1bit";
+                    imageFolder = orgFilename + "_" + colourDepth + "_" + sizePercent;
+                    destinationPath = fs::path(folderRootPath + "/" + colourDepth + "/" + sizePercent + "/" + imageFolder);
+                    
+                    Bitmap bmp1bit(srcFile);
+                    FileManager fm1bit(srcFile, destinationPath);
+                    
+                    fm1bit.setFilename(orgFilename, colourDepth, sizePercent);
+                    bmp1bit.convertFrom8To1Bit();
+                    fm1bit.writeBitmap(bmp1bit.m_header, bmp1bit.m_headerSize, bmp1bit.m_pxData, bmp1bit.m_byteLength);
+                    fm1bit.writeBinFile(bmp1bit.m_pxData, bmp1bit.m_byteLength);
+                }
                 
-                Bitmap bmp4bit(srcFile);
-                FileManager fm4bit(srcFile, destinationPath);
                 
-                fm4bit.setFilename(orgFilename, colourDepth, sizePercent);
-                bmp4bit.convertFrom8To4Bit();
-                fm4bit.writeBitmap(bmp4bit.m_header, bmp4bit.m_headerSize, bmp4bit.m_pxData, bmp4bit.m_byteLength);
-                
-                //************************************** Convert to 2 bit bmp **************************************
-                colourDepth = "2bit";
-                destinationPath = fs::path(folderRootPath + "/" + colourDepth + "/" + sizePercent);
-                
-                Bitmap bmp2bit(srcFile);
-                FileManager fm2bit(srcFile, destinationPath);
-                
-                fm2bit.setFilename(orgFilename, colourDepth, sizePercent);
-                bmp2bit.convertFrom8To2Bit();
-                fm2bit.writeBitmap(bmp2bit.m_header, bmp2bit.m_headerSize, bmp2bit.m_pxData, bmp2bit.m_byteLength);
-                
-                //************************************** Convert to 1 bit bmp **************************************
-                colourDepth = "1bit";
-                destinationPath = fs::path(folderRootPath + "/" + colourDepth + "/" + sizePercent);
-                
-                Bitmap bmp1bit(srcFile);
-                FileManager fm1bit(srcFile, destinationPath);
-                
-                fm1bit.setFilename(orgFilename, colourDepth, sizePercent);
-                bmp1bit.convertFrom8To1Bit();
-                fm1bit.writeBitmap(bmp1bit.m_header, bmp1bit.m_headerSize, bmp1bit.m_pxData, bmp1bit.m_byteLength);
             }
+            
+            
             
             
         }

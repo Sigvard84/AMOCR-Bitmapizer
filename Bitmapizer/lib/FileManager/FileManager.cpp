@@ -16,6 +16,12 @@ FileManager::FileManager(fs::path srcPath, fs::path destinationPath) {
     
     m_srcPath = srcPath;
     m_destinationPath = destinationPath;
+    m_binDestinationPath = destinationPath;
+    
+    string::size_type const lastSlash(destinationPath.string().find_last_of("/\\"));    
+    fs::path parentDirectory = destinationPath.string().substr(0, lastSlash);
+    
+    std::filesystem::create_directory(parentDirectory);
         
     auto directoryWasCreated = std::filesystem::create_directory(destinationPath);
     
@@ -53,9 +59,17 @@ void FileManager::setFilenameAppendix(string appendix) {
 }
 
 
+void FileManager::setFileExt(string fileExt) {
+    
+    string filename = m_folderName + fileExt;
+    m_binDestinationPath += "/" + filename;
+}
+
+
 void FileManager::setFilename(string orgName, string colourDepth, string sizePercent) {
     
-    string filename = orgName + "_" + colourDepth + "_" + sizePercent + ".bmp";
+    m_folderName = orgName + "_" + colourDepth + "_" + sizePercent;
+    string filename = m_folderName + ".bmp";
     m_destinationPath += "/" + filename;
     
     m_fileNameCreated = true;
@@ -80,6 +94,18 @@ void FileManager::readBinaryData() {
 }
 
 
+void FileManager::writeBinFile(uint8_t* pxData, size_t byteLength) {
+    
+    setFileExt(".bin");
+    
+    fstream binFile;
+    binFile.open(m_binDestinationPath, ios::app | ios::binary);
+    
+    binFile.write(reinterpret_cast<char*>(pxData), byteLength);
+    binFile.close();
+}
+
+
 void FileManager::writeBitmap(uint8_t* header, size_t headerSize, uint8_t* pxData, size_t byteLength) {
     
     if (!m_fileNameCreated) {
@@ -93,5 +119,4 @@ void FileManager::writeBitmap(uint8_t* header, size_t headerSize, uint8_t* pxDat
     bmpFile.write(reinterpret_cast<char*>(pxData), byteLength);
     
     bmpFile.close();
-    
 }

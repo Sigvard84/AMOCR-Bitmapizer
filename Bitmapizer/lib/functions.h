@@ -38,6 +38,23 @@ void bitmapize() {
     }
 }
 
+
+string::size_type findNthOccur(string str, char ch, int N) {
+    int occur = 0;
+ 
+    // Loop to find the Nth
+    // occurrence of the character
+    for (int i = 0; i < str.length(); i++) {
+        if (str[i] == ch) {
+            occur += 1;
+        }
+        if (occur == N)
+            return i;
+    }
+    return -1;
+}
+
+
 void convert() {
     
     // Root folder where original images are located within subfolders:
@@ -70,7 +87,8 @@ void convert() {
                 
                 if (fileName.substr(dot, 4) == ".bmp") {
                     
-                    string::size_type const underscore(fileName.find_first_of("_"));
+                    //string::size_type const underscore(fileName.find_first_of("_"));
+                    string::size_type const underscore(findNthOccur(fileName, '_', 2));
                     string orgFilename = fileName.substr(0, underscore);
                     
                     //************************************* Create 8 bit bin files *************************************
